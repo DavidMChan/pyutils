@@ -6,9 +6,12 @@ import email.mime.text
 import smtplib
 from email import encoders
 from typing import List
+import os
+import configparser
 
 
-def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None, sendmail_config_file:str='/home/david/Code/pyutils/mail_config.txt') -> None:
+
+def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None, sendmail_config_file:str=None) -> None:
     """Send an email using the given confiuration file
 
     Arguments:
@@ -24,12 +27,16 @@ def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None, send
         None -- [description]
     """
 
+    if sendmail_config_file is None:
+        sendmail_config_file = os.path.join(os.environ['HOME'], 'pyutils','sendmail_config.ini')
+
+    with open(sendmail_config_file,'r') as cf:
+        config = configparser.ConfigParser()
+        config.read_file(cf)
+
     # Get the mail config from a file
-    from_address = None
-    from_password = None
-    with open(sendmail_config_file, 'r') as mail_config_file:
-        from_address = mail_config_file.readline().strip()
-        from_password = mail_config_file.readline().strip()
+    from_address = config['gmail']['email']
+    from_password = config['gmail']['token']
 
     # Construct the message
     msg = email.mime.multipart.MIMEMultipart()
