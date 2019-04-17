@@ -11,7 +11,7 @@ import configparser
 
 
 
-def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None, sendmail_config_file:str=None) -> None:
+def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None) -> None:
     """Send an email using the given confiuration file
 
     Arguments:
@@ -27,16 +27,15 @@ def send_mail(to_address:str, subject:str, body:str, attach:List[str]=None, send
         None -- [description]
     """
 
-    if sendmail_config_file is None:
-        sendmail_config_file = os.path.join(os.environ['HOME'], 'pyutils','sendmail_config.ini')
+    sendmail_config_file = os.path.join(os.path.dirname(__file__), 'sendmail_config.ini')
 
     with open(sendmail_config_file,'r') as cf:
         config = configparser.ConfigParser()
         config.read_file(cf)
 
     # Get the mail config from a file
-    from_address = config['gmail']['email']
-    from_password = config['gmail']['token']
+    from_address = config['gmail']['email'].strip()
+    from_password = config['gmail']['token'].strip()
 
     # Construct the message
     msg = email.mime.multipart.MIMEMultipart()
